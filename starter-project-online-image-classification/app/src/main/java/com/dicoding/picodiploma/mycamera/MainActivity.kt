@@ -3,6 +3,7 @@ package com.dicoding.picodiploma.mycamera
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +25,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.HttpException
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -115,14 +117,14 @@ class MainActivity : AppCompatActivity() {
     private fun uploadImage() {
 //        Toast.makeText(this, "Fitur ini belum tersedia", Toast.LENGTH_SHORT).show()
         currentImageUri?.let { uri ->
-            val imageFile = uriToFile(uri, this)
+            val imageFile = uriToFile(uri, this).reduceFileImage()
             Log.d("Image Classification file", "showImage: ${imageFile.path}")
             showLoading(true)
 
             // making request body
             val requestImageFile = imageFile.asRequestBody("image/jpeg".toMediaType())
             val multipartBody = MultipartBody.Part.createFormData(
-                "file",
+                "photo",
                 imageFile.name,
                 requestImageFile
             )
@@ -159,8 +161,6 @@ class MainActivity : AppCompatActivity() {
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
-
-
 
     companion object {
         private const val REQUIRED_PERMISSION = Manifest.permission.CAMERA
