@@ -1,4 +1,4 @@
-# Dicoding-FundamentalAndroid
+# Dicoding-MachineLearningAndroid
 Repository for [Documentations Dicoding - Belajar Penerapan Machine Learning untuk Android](https://www.dicoding.com/academies/663)
 
 ## Purpose
