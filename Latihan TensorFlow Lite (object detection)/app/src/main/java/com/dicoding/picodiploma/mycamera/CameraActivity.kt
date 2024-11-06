@@ -92,19 +92,18 @@ class CameraActivity : AppCompatActivity() {
                     }
                 }
 
-                override fun onResults(results: MutableList<Detection>?, inferenceTime: Long) {
+                override fun onResults(
+                    results: MutableList<Detection>?,
+                    inferenceTime: Long,
+                    imageHeight: Int,
+                    imageWidth: Int
+                ) {
                     runOnUiThread {
                         results?.let { it ->
                             if (it.isNotEmpty() && it[0].categories.isNotEmpty()) {
                                 println(it)
 
-                     /*           val sortedCategories =
-                                    it[0].categories.sortedByDescending { it?.score }
-                                val displayResult =
-                                    sortedCategories.joinToString("\n") {
-                                        "${it.label} " + NumberFormat.getPercentInstance()
-                                            .format(it.score).trim()
-                                    }*/
+                                /*
                                 val builder = StringBuilder()
                                 for (result in results) {
                                     val displayResult =
@@ -115,12 +114,21 @@ class CameraActivity : AppCompatActivity() {
 
                                 binding.tvResult.text = builder.toString()
                                 binding.tvResult.visibility = View.VISIBLE
+                                */
+
+                                binding.overlay.setResults(
+                                    results, imageHeight, imageWidth
+                                )
+
                                 binding.tvInferenceTime.text = "$inferenceTime ms"
                             } else {
-                                binding.tvResult.text = ""
+//                                binding.tvResult.text = ""
+                                binding.overlay.clear()
                                 binding.tvInferenceTime.text = ""
                             }
                         }
+                        // Force a redraw
+                        binding.overlay.invalidate()
                     }
                 }
             }
