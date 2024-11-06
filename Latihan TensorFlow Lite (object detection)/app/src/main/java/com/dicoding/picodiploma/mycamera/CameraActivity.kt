@@ -3,6 +3,7 @@ package com.dicoding.picodiploma.mycamera
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
@@ -15,7 +16,7 @@ import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.dicoding.picodiploma.mycamera.databinding.ActivityCameraBinding
-import org.tensorflow.lite.task.gms.vision.classifier.Classifications
+import org.tensorflow.lite.task.gms.vision.detector.Detection
 import java.text.NumberFormat
 import java.util.concurrent.Executors
 
@@ -23,7 +24,7 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCameraBinding
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
-    private lateinit var imageClassifierHelper: ImageClassifierHelper
+    private lateinit var objectDetectorHelper: ObjectDetectorHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +54,7 @@ class CameraActivity : AppCompatActivity() {
                 .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
                 .build()
             imageAnalyzer.setAnalyzer(Executors.newSingleThreadExecutor()) { image ->
-                imageClassifierHelper.classifyImage(image)
+                objectDetectorHelper.detectObject(image)
             }
 
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
@@ -82,27 +83,38 @@ class CameraActivity : AppCompatActivity() {
             }
         }, ContextCompat.getMainExecutor(this))
 
-        imageClassifierHelper = ImageClassifierHelper(
+        objectDetectorHelper = ObjectDetectorHelper(
             context = this,
-            classifierListener = object : ImageClassifierHelper.ClassifierListener {
+            detectorListener = object : ObjectDetectorHelper.DetectorListener {
                 override fun onError(error: String) {
                     runOnUiThread {
                         Toast.makeText(this@CameraActivity, error, Toast.LENGTH_SHORT).show()
                     }
                 }
-                override fun onResults(results: List<Classifications>?, inferenceTime: Long) {
+
+                override fun onResults(results: MutableList<Detection>?, inferenceTime: Long) {
                     runOnUiThread {
                         results?.let { it ->
                             if (it.isNotEmpty() && it[0].categories.isNotEmpty()) {
                                 println(it)
-                                val sortedCategories =
+
+                     /*           val sortedCategories =
                                     it[0].categories.sortedByDescending { it?.score }
                                 val displayResult =
                                     sortedCategories.joinToString("\n") {
                                         "${it.label} " + NumberFormat.getPercentInstance()
                                             .format(it.score).trim()
-                                    }
-                                binding.tvResult.text = displayResult
+                                    }*/
+                                val builder = StringBuilder()
+                                for (result in results) {
+                                    val displayResult =
+                                        "${result.categories[0].label} " + NumberFormat.getPercentInstance()
+                                            .format(result.categories[0].score).trim()
+                                    builder.append("$displayResult \n")
+                                }
+
+                                binding.tvResult.text = builder.toString()
+                                binding.tvResult.visibility = View.VISIBLE
                                 binding.tvInferenceTime.text = "$inferenceTime ms"
                             } else {
                                 binding.tvResult.text = ""
