@@ -6,9 +6,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.dicoding.asclepius.data.local.CancerRepository
 import com.dicoding.asclepius.di.Injection
 
-class HistoryFactory private constructor(private val cancerRepository: CancerRepository): ViewModelProvider.NewInstanceFactory(){
+// Factory to create HistoryViewModel with a specific repository
+class HistoryFactory private constructor(private val cancerRepository: CancerRepository): ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        // Returns HistoryViewModel instance if requested
         if (modelClass.isAssignableFrom(HistoryViewModel::class.java)) {
             return HistoryViewModel(cancerRepository) as T
         }
@@ -18,6 +20,8 @@ class HistoryFactory private constructor(private val cancerRepository: CancerRep
     companion object {
         @Volatile
         private var instance: HistoryFactory? = null
+
+        // Singleton pattern to ensure a single instance of HistoryFactory
         fun getInstance(context: Context): HistoryFactory =
             instance ?: synchronized(this) {
                 instance ?: HistoryFactory(Injection.provideCancerRepository(context))

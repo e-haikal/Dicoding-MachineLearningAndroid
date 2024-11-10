@@ -10,7 +10,8 @@ import com.dicoding.asclepius.R
 import com.dicoding.asclepius.data.remote.ArticlesItem
 import com.dicoding.asclepius.databinding.ItemNewsBinding
 
-class NewsAdapter(private val onItemClick: (String) -> Unit) : ListAdapter<ArticlesItem, NewsAdapter.NewsViewHolder>(DIFF_CALLBACK){
+// Adapter for displaying list of news articles in RecyclerView
+class NewsAdapter(private val onItemClick: (String) -> Unit) : ListAdapter<ArticlesItem, NewsAdapter.NewsViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val view = ItemNewsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -21,10 +22,13 @@ class NewsAdapter(private val onItemClick: (String) -> Unit) : ListAdapter<Artic
         holder.bind(getItem(position))
     }
 
+    // ViewHolder to bind each article's data to UI components in the item layout
     class NewsViewHolder(
-        private val binding : ItemNewsBinding,
+        private val binding: ItemNewsBinding,
         private val onItemClick: (String) -> Unit
-    ): RecyclerView.ViewHolder(binding.root) {
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        // Binds news item data to views and sets click listener to open URL
         fun bind(news: ArticlesItem) {
             binding.tvNewsTitle.text = news.title
             binding.tvNewsDate.text = news.publishedAt
@@ -34,6 +38,7 @@ class NewsAdapter(private val onItemClick: (String) -> Unit) : ListAdapter<Artic
                 .placeholder(R.drawable.ic_launcher_background)
                 .into(binding.ivNewsImage)
 
+            // Trigger onItemClick with the news URL when item is clicked
             binding.root.setOnClickListener {
                 onItemClick(news.url)
             }
@@ -41,22 +46,11 @@ class NewsAdapter(private val onItemClick: (String) -> Unit) : ListAdapter<Artic
     }
 
     companion object {
+        // Callback for efficient RecyclerView updates when data changes
         val DIFF_CALLBACK: DiffUtil.ItemCallback<ArticlesItem> =
             object : DiffUtil.ItemCallback<ArticlesItem>() {
-                override fun areItemsTheSame(
-                    oldItem: ArticlesItem,
-                    newItem: ArticlesItem
-                ): Boolean {
-                    return oldItem.title == newItem.title
-                }
-
-                override fun areContentsTheSame(
-                    oldItem: ArticlesItem,
-                    newItem: ArticlesItem
-                ): Boolean {
-                    return oldItem == newItem
-                }
-
+                override fun areItemsTheSame(oldItem: ArticlesItem, newItem: ArticlesItem) = oldItem.title == newItem.title
+                override fun areContentsTheSame(oldItem: ArticlesItem, newItem: ArticlesItem) = oldItem == newItem
             }
     }
 }

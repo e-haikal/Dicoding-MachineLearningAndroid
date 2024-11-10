@@ -6,10 +6,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.dicoding.asclepius.data.remote.Repository
 import com.dicoding.asclepius.di.Injection
 
-class NewsFactory private constructor(private val repository: Repository): ViewModelProvider.NewInstanceFactory(){
+// Factory to create NewsViewModel instances with custom parameters
+class NewsFactory private constructor(private val repository: Repository) : ViewModelProvider.NewInstanceFactory() {
+
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(NewsViewModel::class.java)){
+        if (modelClass.isAssignableFrom(NewsViewModel::class.java)) {
             return NewsViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel Class: " + modelClass.name)
@@ -18,6 +20,8 @@ class NewsFactory private constructor(private val repository: Repository): ViewM
     companion object {
         @Volatile
         private var instance: NewsFactory? = null
+
+        // Singleton pattern for factory instance creation
         fun getInstance(context: Context): NewsFactory =
             instance ?: synchronized(this) {
                 instance ?: NewsFactory(Injection.provideRepository(context))

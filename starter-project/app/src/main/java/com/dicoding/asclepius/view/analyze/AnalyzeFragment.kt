@@ -24,11 +24,10 @@ import java.io.File
 
 class AnalyzeFragment : Fragment() {
 
-    private var _binding : FragmentAnalyzeBinding? = null
+    private var _binding : FragmentAnalyzeBinding? = null  // View binding for the layout
     private val binding get() = _binding!!
-//    private var currentImageUri: Uri? = null
 
-    private val viewModel: AnalyzeViewModel by viewModels()
+    private val viewModel: AnalyzeViewModel by viewModels()  // ViewModel for managing image URI
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,48 +41,57 @@ class AnalyzeFragment : Fragment() {
 
         activity?.title = "Analyze your Skin"
 
-        showImage()
+        showImage()  // Displays the image if one is already selected
 
+        // Opens the gallery to select an image
         binding.galleryButton.setOnClickListener {
             startGallery()
         }
+
+        // Starts the analysis process on the selected image
         binding.analyzeButton.setOnClickListener {
             analyzeImage()
         }
     }
 
+    // Launches the gallery to pick an image
     private fun startGallery() {
         launcherGallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
+    // Handles the result of the image selection from the gallery
     private val launcherGallery = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
         if (uri != null) {
-            viewModel.currentImageUri = uri
-            startCrop(uri)
+            viewModel.currentImageUri = uri  // Saves the selected image URI in the ViewModel
+            startCrop(uri)  // Starts the cropping process
         } else {
             Log.d("Photo Picker", getString(R.string.no_media_selected))
-            showToast(getString(R.string.no_media_selected))
+            showToast(getString(R.string.no_media_selected))  // Shows a message if no image was selected
         }
     }
 
+    // Displays the selected or cropped image in the preview
     private fun showImage() {
         viewModel.currentImageUri?.let {
             Log.d("Image URI", "showImage: $it")
-            binding.previewImageView.setImageURI(it)
+            binding.previewImageView.setImageURI(it)  // Sets the preview image view to display the URI
         }
     }
 
+    // Analyzes the selected image using the ImageClassifierHelper
     private fun analyzeImage() {
         viewModel.currentImageUri?.let { uri ->
             val imageClassifierHelper = ImageClassifierHelper(
                 context = requireContext(),
                 classifierListener = object : ImageClassifierHelper.ClassifierListener {
+                    // Displays an error if classification fails
                     override fun onError(error: String) {
                         showToast("Error: $error")
                     }
 
+                    // Processes the classification result and displays it
                     override fun onResult(results: List<Classifications>?, inferenceTime: Long) {
                         val resultText = results?.joinToString("\n") { classification ->
                             classification.categories.joinToString(", ") {
@@ -91,23 +99,25 @@ class AnalyzeFragment : Fragment() {
                             }
                         }
                         resultText?.let {
-                            moveToResult(uri, it)
+                            moveToResult(uri, it)  // Moves to ResultActivity with the analysis result
                         } ?: showToast(getString(R.string.tidak_ada_hasil_yang_ditemukan))
                     }
                 }
             )
 
-            // Klasifikasi gambar
+            // Begins the image classification process
             imageClassifierHelper.classifyStaticImage(uri)
         } ?: run {
-            showToast(getString(R.string.pilih_gambar_terlebih_dahulu))
+            showToast(getString(R.string.pilih_gambar_terlebih_dahulu))  // Shows a message if no image was selected
         }
     }
 
+    // Shows a toast message with the given string
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
+    // Starts ResultActivity and passes the image URI and analysis result
     private fun moveToResult(imageUri: Uri, resultText: String) {
         val intent = Intent(requireContext(), ResultActivity::class.java).apply {
             putExtra("IMAGE_URI", imageUri)
@@ -116,14 +126,15 @@ class AnalyzeFragment : Fragment() {
         startActivity(intent)
     }
 
+    // Handles the result of the cropping process
     private val cropActivityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data
-            val resultUri = data?.let { UCrop.getOutput(it) }
+            val resultUri = data?.let { UCrop.getOutput(it) }  // Gets the cropped image URI
             if (resultUri != null) {
-                viewModel.currentImageUri = resultUri
+                viewModel.currentImageUri = resultUri  // Updates the image URI with the cropped image
                 showImage()
             } else {
                 showToast(getString(R.string.error_no_image_returned_after_cropping))
@@ -134,26 +145,26 @@ class AnalyzeFragment : Fragment() {
             } else {
                 val cropError = UCrop.getError(result.data!!)
                 cropError?.let {
-                    showToast("Crop failed: ${it.message}")
+                    showToast("Crop failed: ${it.message}")  // Shows a message if cropping failed
                 }
             }
         }
     }
 
+    // Starts the cropping activity using uCrop library
     private fun startCrop(uri: Uri) {
         val destinationUri = Uri.fromFile(File(requireContext().cacheDir, "cropped_${System.currentTimeMillis()}.jpg"))
         val uCrop = UCrop.of(uri, destinationUri)
-        uCrop.withAspectRatio(1f, 1f)
-        uCrop.withMaxResultSize(1000, 1000)
+        uCrop.withAspectRatio(1f, 1f)  // Sets a square crop aspect ratio
+        uCrop.withMaxResultSize(1000, 1000)  // Limits the maximum result size
 
         val intent = uCrop.getIntent(requireContext())
         cropActivityResultLauncher.launch(intent)
     }
 
-
+    // Cleans up the binding when the fragment is destroyed
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
     }
-
 }
