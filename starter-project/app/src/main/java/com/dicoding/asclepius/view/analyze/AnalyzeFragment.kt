@@ -28,6 +28,7 @@ class AnalyzeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: AnalyzeViewModel by viewModels()  // ViewModel for managing image URI
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -142,6 +143,10 @@ class AnalyzeFragment : Fragment() {
         } else {
             if (result.resultCode == Activity.RESULT_CANCELED) {
                 Log.d("uCrop", "Crop cancelled by user")
+                // If cropping was canceled, just use the selected image URI
+                viewModel.currentImageUri?.let {
+                    showImage()  // Show the selected image
+                }
             } else {
                 val cropError = UCrop.getError(result.data!!)
                 cropError?.let {
