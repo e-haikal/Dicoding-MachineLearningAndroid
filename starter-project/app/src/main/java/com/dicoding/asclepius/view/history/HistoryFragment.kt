@@ -30,7 +30,7 @@ class HistoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        activity?.title = "History"
+        activity?.title = "Analyze History"
 
         historyAdapter = HistoryAdapter()
         binding.rvHistory.apply {

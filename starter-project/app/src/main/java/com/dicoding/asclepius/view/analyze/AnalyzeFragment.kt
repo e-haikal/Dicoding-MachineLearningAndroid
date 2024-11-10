@@ -40,7 +40,7 @@ class AnalyzeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        activity?.title = "Analyze"
+        activity?.title = "Analyze your Skin"
 
         showImage()
 

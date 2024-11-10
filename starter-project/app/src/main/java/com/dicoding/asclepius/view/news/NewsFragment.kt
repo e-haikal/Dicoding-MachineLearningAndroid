@@ -28,7 +28,7 @@ class NewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        activity?.title = "News"
+        activity?.title = "Latest News"
 
         viewModel = ViewModelProvider(this, NewsFactory.getInstance(requireContext()))[NewsViewModel::class.java]
 

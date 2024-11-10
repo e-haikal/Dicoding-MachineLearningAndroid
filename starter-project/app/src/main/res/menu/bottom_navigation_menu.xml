@@ -6,12 +6,13 @@
         android:icon="@drawable/ic_camera_outline_24"/>
 
     <item
+        android:id="@+id/nav_history"
+        android:title="History"
+        android:icon="@drawable/ic_history_outline_24"/>
+
+    <item
         android:id="@+id/nav_news"
         android:title="News"
         android:icon="@drawable/ic_news_outline_24"/>
 
-    <item
-        android:id="@+id/nav_history"
-        android:title="History"
-        android:icon="@drawable/ic_history_outline_24"/>
 </menu>
