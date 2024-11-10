@@ -17,7 +17,7 @@ class Repository private constructor(
                 query = "cancer",
                 category = "health",
                 language = "en",
-                apiKey = "63709063e62649f2ba6ad32e1794a0de"
+                apiKey = "cb6c561f7c08482eada7612d2a923ef3"
             )
             emit(Result.Success(response.articles))  // Emits success with the articles list
         } catch (e: Exception) {
