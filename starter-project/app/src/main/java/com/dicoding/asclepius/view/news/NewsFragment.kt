@@ -28,6 +28,8 @@ class NewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        activity?.title = "News"
+
         viewModel = ViewModelProvider(this, NewsFactory.getInstance(requireContext()))[NewsViewModel::class.java]
 
         adapter = NewsAdapter { newsUrl ->

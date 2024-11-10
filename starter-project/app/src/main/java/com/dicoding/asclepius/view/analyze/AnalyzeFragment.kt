@@ -40,6 +40,8 @@ class AnalyzeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        activity?.title = "Analyze"
+
         showImage()
 
         binding.galleryButton.setOnClickListener {
@@ -153,4 +155,5 @@ class AnalyzeFragment : Fragment() {
         super.onDestroy()
         _binding = null
     }
+
 }

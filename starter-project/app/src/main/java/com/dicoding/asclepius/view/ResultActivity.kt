@@ -4,6 +4,9 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.dicoding.asclepius.R
 import com.dicoding.asclepius.data.local.CancerEntity
@@ -20,6 +23,15 @@ class ResultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityResultBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        enableEdgeToEdge()
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            insets
+        }
+
+        supportActionBar?.title = "Analyze Result"
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val factory = HistoryFactory.getInstance(this)
         historyViewModel = ViewModelProvider(this, factory)[HistoryViewModel::class.java]
@@ -56,4 +68,15 @@ class ResultActivity : AppCompatActivity() {
             }
         }
     }
+    // Handle the "Up" button click here
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()  // This takes the user back to the previous screen
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
 }
